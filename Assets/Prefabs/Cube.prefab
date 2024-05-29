@@ -146,5 +146,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c088456ee1874d0458639f17b37ccfae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSecondsToDestroy: 2
-  maxSecondsToDestroy: 3
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -11,7 +12,7 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] private float _maxStartPointOffestX;
     [SerializeField] private float _maxStartPointOffestZ;
-    [SerializeField] private float _repeatRate;
+    [SerializeField] private float _spawnDelay;
 
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
@@ -32,6 +33,12 @@ public class Spawner : MonoBehaviour
 
         _destroyer.DestroyPrepeared += ReleaseCube;
     }
+
+    private void Start()
+    {
+        StartCoroutine(Spawning());
+    }
+
     private void ActionOnGet(Cube cube)
     {
         cube.Init(GetRandomStartPosition());
@@ -44,6 +51,7 @@ public class Spawner : MonoBehaviour
     {
         RemoveAllActions(cube);
         cube.gameObject.SetActive(false);
+
     }
 
     private void ActionOnDestroy(Cube cube)
@@ -66,9 +74,15 @@ public class Spawner : MonoBehaviour
         return new Vector3(randomX, 0, randomZ) + _startPoint.position;
     }
 
-    private void Start()
+    private IEnumerator Spawning()
     {
-        InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
+        var delay = new WaitForSeconds(_spawnDelay);
+
+        while (enabled)
+        {
+            yield return delay;
+            GetCube();
+        }
     }
 
     private void GetCube()

@@ -25,7 +25,6 @@ public class Destroyer : MonoBehaviour
     private IEnumerator PrepareDestroy(Cube cube, float secondsToDestroy)
     {
         yield return new WaitForSeconds(secondsToDestroy);
-
         DestroyPrepeared?.Invoke(cube);
     }
 }

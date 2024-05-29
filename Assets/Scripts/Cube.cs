@@ -24,9 +24,21 @@ public class Cube : MonoBehaviour
     {
         if (_isCubeCollide == false)
         {
-            OnCubeCollide?.Invoke(this);
-            _isCubeCollide = true;
+            if (collision.gameObject.TryGetComponent<Platform>(out _))
+            {
+                OnCubeCollide?.Invoke(this);
+                _isCubeCollide = true;
+            }
         }
+    }
+
+    public void Init(Vector3 startPosition)
+    {
+        transform.position = startPosition;
+        _rigidbody.velocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        SetColor(defaultColor);
+        _isCubeCollide = false;
     }
 
     public void SetColor(Color color)
@@ -34,11 +46,5 @@ public class Cube : MonoBehaviour
         string propertyName = "_Color";
 
         _renderer.material.SetColor(propertyName, color);
-    }
-
-    public void Init(Vector3 startPosition)
-    {
-        transform.position = startPosition;
-        _rigidbody.velocity = Vector3.zero;
     }
 }
