@@ -8,6 +8,8 @@ public class ActiveObjectsFromPools : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _countText;
     [SerializeField] private PoolRequiredWrapper _poolRequiredWrapper;
 
+    private string _additionalString = "Active objects: ";
+
     private List<IPoolRequired> _spawners;
 
     private int _generalCountObjectsFromPools = 0;
@@ -15,6 +17,8 @@ public class ActiveObjectsFromPools : MonoBehaviour
     private void Awake()
     {
         _spawners = _poolRequiredWrapper.GetSpawners();
+
+        SetText();
     }
 
     private void OnEnable()
@@ -38,6 +42,11 @@ public class ActiveObjectsFromPools : MonoBehaviour
     private void UpdateView()
     {
         UpdateGeneralCount();
-        _countText.text = _generalCountObjectsFromPools.ToString();
+        SetText();
+    }
+
+    private void SetText()
+    {
+        _countText.text = _additionalString + _generalCountObjectsFromPools.ToString();
     }
 }

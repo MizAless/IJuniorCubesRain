@@ -11,6 +11,11 @@ public class SpawnerCounterView<T> : MonoBehaviour where T : MonoBehaviour, ISpa
     private string _spawned = "spawned";
     private string _sepatator = ": ";
 
+    private void Awake()
+    {
+        ChangeView(0);
+    }
+
     private void OnEnable()
     {
         _spawner.Spawned += ChangeView;
