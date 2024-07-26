@@ -1,18 +1,12 @@
 using System;
 using UnityEngine;
 
-[RequireComponent (typeof(Renderer))]
-[RequireComponent (typeof(Rigidbody))]
-public class Cube : MonoBehaviour, ISpawnable, IDestroyable
+public class Bomb : MonoBehaviour, ISpawnable, IDestroyable
 {
-    [SerializeField] Color defaultColor;
-
     private Renderer _renderer;
     private Rigidbody _rigidbody;
 
-    private bool _isCubeCollide = false;
-
-    public event Action<Cube> OnCollide;
+    private float _startAlpha = 1f;
 
     public event Action<IDestroyable> DestroyPrepared;
     public event Action<float> ChangedCurrentDestroyProgress;
@@ -23,16 +17,14 @@ public class Cube : MonoBehaviour, ISpawnable, IDestroyable
         _rigidbody = GetComponent<Rigidbody>();
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnEnable()
     {
-        if (_isCubeCollide == false)
-        {
-            if (collision.gameObject.TryGetComponent<Platform>(out _))
-            {
-                OnCollide?.Invoke(this);
-                _isCubeCollide = true;
-            }
-        }
+        ChangedCurrentDestroyProgress += SetAlpha;
+    }
+
+    private void OnDisable()
+    {
+        ChangedCurrentDestroyProgress -= SetAlpha;
     }
 
     public void Init(Vector3 startPosition)
@@ -40,8 +32,13 @@ public class Cube : MonoBehaviour, ISpawnable, IDestroyable
         transform.position = startPosition;
         _rigidbody.velocity = Vector3.zero;
         transform.rotation = Quaternion.identity;
-        SetColor(defaultColor);
-        _isCubeCollide = false;
+        SetAlpha(_startAlpha);
+    }
+
+    public void ChangeCurrentDestroyProgress(float progress)
+    {
+        float reversedProgress = 1 - progress;
+        SetAlpha(reversedProgress);
     }
 
     public void PrepareToDestroy()
@@ -49,11 +46,12 @@ public class Cube : MonoBehaviour, ISpawnable, IDestroyable
         DestroyPrepared?.Invoke(this);
     }
 
-    public void ChangeCurrentDestroyProgress(float progress) { }
-
-    public void SetColor(Color color)
+    public void SetAlpha(float value)
     {
         string propertyName = "_Color";
+        Color color = _renderer.material.color;
+
+        color.a = value;
 
         _renderer.material.SetColor(propertyName, color);
     }

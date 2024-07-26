@@ -12,4 +12,9 @@ public class ColorChanger : MonoBehaviour
 
         cube.SetColor(newColor);
     }
+
+    public void SetAlpha(Bomb bomb, float value)
+    {
+        bomb.SetAlpha(value);
+    }
 }

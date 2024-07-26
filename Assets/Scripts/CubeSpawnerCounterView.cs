@@ -1,0 +1,1 @@
+public class CubeSpawnerCounterView : SpawnerCounterView<Cube> { }

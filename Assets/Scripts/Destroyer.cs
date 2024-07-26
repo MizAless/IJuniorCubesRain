@@ -7,24 +7,40 @@ public class Destroyer : MonoBehaviour
     [SerializeField] private float minSecondsToDestroy = 2f;
     [SerializeField] private float maxSecondsToDestroy = 5f;
 
-    public event Action<Cube> DestroyPrepeared;
-
     private void OnValidate()
     {
         if (minSecondsToDestroy > maxSecondsToDestroy)
             minSecondsToDestroy = maxSecondsToDestroy - 1f;
     }
 
-    public void DestroyWithDelay(Cube cube)
+    public void DestroyImmediately(IDestroyable destroyableObj)
+    {
+        destroyableObj.PrepareToDestroy();
+    }
+
+    public void DestroyWithDelay(IDestroyable destroyableObj)
     {
         float secondsToDestroy = UnityEngine.Random.Range(minSecondsToDestroy, maxSecondsToDestroy);
         
-        StartCoroutine(PrepareDestroy(cube, secondsToDestroy));
+        StartCoroutine(PrepareDestroy(destroyableObj, secondsToDestroy));
     }
 
-    private IEnumerator PrepareDestroy(Cube cube, float secondsToDestroy)
+    private IEnumerator PrepareDestroy(IDestroyable destroyableObj, float secondsToDestroy)
     {
-        yield return new WaitForSeconds(secondsToDestroy);
-        DestroyPrepeared?.Invoke(cube);
+        float progress = 0;
+        float expiredTime = 0;
+
+        var delay = new WaitForFixedUpdate();
+
+        while (progress < 1)
+        {
+            expiredTime += Time.fixedDeltaTime;
+            progress = expiredTime / secondsToDestroy;
+            destroyableObj.ChangeCurrentDestroyProgress(progress);
+            yield return delay;
+        }
+
+        //yield return new WaitForSeconds(secondsToDestroy);
+        destroyableObj.PrepareToDestroy();
     }
 }

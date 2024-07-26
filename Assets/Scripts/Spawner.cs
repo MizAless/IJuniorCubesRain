@@ -1,28 +1,25 @@
-using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class Spawner : MonoBehaviour
+public abstract class Spawner<T> : MonoBehaviour, IPoolRequired where T : MonoBehaviour, ISpawnable
 {
-    [SerializeField] private Destroyer _destroyer;
-    [SerializeField] private ColorChanger _colorChanger;
-
-    [SerializeField] private Cube _cubePrefab;
-    [SerializeField] private Transform _startPoint;
-
-    [SerializeField] private float _maxStartPointOffestX;
-    [SerializeField] private float _maxStartPointOffestZ;
-    [SerializeField] private float _spawnDelay;
+    [SerializeField] private T _spawnableObject;
 
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
 
-    private ObjectPool<Cube> _pool;
+    private ObjectPool<T> _pool;
 
-    private void Awake()
+    private int _createdObjectCount = 0;
+
+    public event Action<int> Spawned;
+    public event Action ChangedPoolObjectsCount;
+
+    public void Init()
     {
-        _pool = new ObjectPool<Cube>(
-            createFunc: () => Instantiate(_cubePrefab),
+        _pool = new ObjectPool<T>(
+            createFunc: () => Instantiate(_spawnableObject),
             actionOnGet: (obj) => ActionOnGet(obj),
             actionOnRelease: (obj) => ActionOnRelease(obj),
             actionOnDestroy: (obj) => ActionOnDestroy(obj),
@@ -31,67 +28,42 @@ public class Spawner : MonoBehaviour
             maxSize: _poolMaxSize
         );
 
-        _destroyer.DestroyPrepeared += ReleaseCube;
+        Spawned?.Invoke(_createdObjectCount);
+        ChangedPoolObjectsCount?.Invoke();
     }
 
-    private void Start()
+    public int GetActiveObjectsCount()
     {
-        StartCoroutine(Spawning());
+        return _pool.CountActive;
     }
 
-    private void ActionOnGet(Cube cube)
+    public virtual T Spawn()
     {
-        cube.Init(GetRandomStartPosition());
-        cube.OnCubeCollide += _destroyer.DestroyWithDelay;
-        cube.OnCubeCollide += _colorChanger.SetRandomColor;
-        cube.gameObject.SetActive(true);
+        return _pool.Get();
     }
 
-    private void ActionOnRelease(Cube cube)
+    public virtual void Release(T releasedObject)
     {
-        RemoveAllActions(cube);
-        cube.gameObject.SetActive(false);
-
+        _pool.Release(releasedObject);
+        ChangedPoolObjectsCount?.Invoke();
     }
 
-    private void ActionOnDestroy(Cube cube)
+    protected virtual void ActionOnGet(T getedObject)
     {
-        RemoveAllActions(cube);
-        Destroy(cube.gameObject);
+        getedObject.gameObject.SetActive(true);
+        _createdObjectCount++;
+        Spawned?.Invoke(_createdObjectCount);
+        ChangedPoolObjectsCount?.Invoke();
     }
 
-    private void RemoveAllActions(Cube cube)
+    protected virtual void ActionOnRelease(T releasedObject)
     {
-        cube.OnCubeCollide -= _destroyer.DestroyWithDelay;
-        cube.OnCubeCollide -= _colorChanger.SetRandomColor;
+        releasedObject.gameObject.SetActive(false);
+        ChangedPoolObjectsCount?.Invoke();
     }
 
-    private Vector3 GetRandomStartPosition()
+    protected virtual void ActionOnDestroy(T destroyedObject)
     {
-        float randomX = UnityEngine.Random.Range(-_maxStartPointOffestX, _maxStartPointOffestX);
-        float randomZ = UnityEngine.Random.Range(-_maxStartPointOffestZ, _maxStartPointOffestZ); 
-
-        return new Vector3(randomX, 0, randomZ) + _startPoint.position;
-    }
-
-    private IEnumerator Spawning()
-    {
-        var delay = new WaitForSeconds(_spawnDelay);
-
-        while (enabled)
-        {
-            yield return delay;
-            GetCube();
-        }
-    }
-
-    private void GetCube()
-    {
-        _pool.Get();
-    }
-
-    private void ReleaseCube(Cube cube)
-    {
-        _pool.Release(cube);
+        Destroy(destroyedObject.gameObject);
     }
 }
