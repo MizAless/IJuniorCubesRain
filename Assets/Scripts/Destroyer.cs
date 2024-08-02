@@ -23,10 +23,11 @@ public class Destroyer : MonoBehaviour
     {
         float progress = 0;
         float expiredTime = 0;
+        float maxProgress = 1;
 
         var delay = new WaitForFixedUpdate();
 
-        while (progress < 1)
+        while (progress < maxProgress)
         {
             expiredTime += Time.fixedDeltaTime;
             progress = expiredTime / secondsToDestroy;
