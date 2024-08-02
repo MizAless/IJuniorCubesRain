@@ -2,11 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public abstract class Spawner<T> : MonoBehaviour, IPoolRequired 
-    where T : MonoBehaviour, ISpawnable
+public abstract class SpawnerNew : MonoBehaviour
 {
-    [SerializeField] private T _spawnableObject;
-
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
 
@@ -16,11 +13,6 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
 
     public event Action<int> Spawned;
     public event Action ChangedPoolObjectsCount;
-
-    private void Awake()
-    {
-        Init();
-    }
 
     public void Init()
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent (typeof(Rigidbody))]
 public class Cube : MonoBehaviour, ISpawnable, IDestroyable
 {
-    [SerializeField] Color defaultColor;
+    [SerializeField] private Color defaultColor;
 
     private Renderer _renderer;
     private Rigidbody _rigidbody;

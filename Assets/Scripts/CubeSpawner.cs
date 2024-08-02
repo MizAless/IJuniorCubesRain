@@ -13,11 +13,6 @@ public class CubeSpawner : Spawner<Cube>
     [SerializeField] private float _maxStartPointOffestZ;
     [SerializeField] private float _spawnDelay;
 
-    private void Awake()
-    {
-        base.Init();
-    }
-
     private void Start()
     {
         StartCoroutine(Spawning());

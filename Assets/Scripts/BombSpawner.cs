@@ -1,16 +1,10 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class BombSpawner : Spawner<Bomb>
 {
     [SerializeField] private Destroyer _destroyer;
     [SerializeField] private Exploder _exploder;
     [SerializeField] private ColorChanger _colorChanger;
-
-    private void Awake()
-    {
-        base.Init();
-    }
 
     private void Release(IDestroyable destroyebleBomb)
     {
