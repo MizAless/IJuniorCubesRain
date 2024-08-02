@@ -15,7 +15,7 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
     private int _createdObjectCount = 0;
 
     public event Action<int> Spawned;
-    public event Action ChangedPoolObjectsCount;
+    public event Action<int> ChangedPoolObjectsCount;
 
     private void Awake()
     {
@@ -33,15 +33,12 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
         );
-
-        Spawned?.Invoke(_createdObjectCount);
-        ChangedPoolObjectsCount?.Invoke();
     }
 
-    public int GetActiveObjectsCount()
-    {
-        return _pool.CountActive;
-    }
+    //public int GetActiveObjectsCount()
+    //{
+    //    return _pool.CountActive;
+    //}
 
     public virtual T Spawn()
     {
@@ -51,7 +48,6 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
     public virtual void Release(T releasedObject)
     {
         _pool.Release(releasedObject);
-        ChangedPoolObjectsCount?.Invoke();
     }
 
     protected virtual void ActionOnGet(T getedObject)
@@ -59,17 +55,18 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
         getedObject.gameObject.SetActive(true);
         _createdObjectCount++;
         Spawned?.Invoke(_createdObjectCount);
-        ChangedPoolObjectsCount?.Invoke();
+        ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
     }
 
     protected virtual void ActionOnRelease(T releasedObject)
     {
         releasedObject.gameObject.SetActive(false);
-        ChangedPoolObjectsCount?.Invoke();
+        ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
     }
 
     protected virtual void ActionOnDestroy(T destroyedObject)
     {
         Destroy(destroyedObject.gameObject);
+        ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
     }
 }

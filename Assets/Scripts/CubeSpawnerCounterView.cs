@@ -1,1 +1,1 @@
-public class CubeSpawnerCounterView : SpawnerCounterView<Cube> { }
+public class CubeSpawnerCounterView : SpawnerView<Cube> { }

@@ -1,1 +1,1 @@
-public class BombSpawnerCounterView : SpawnerCounterView<Bomb> { }
+public class BombSpawnerCounterView : SpawnerView<Bomb> { }
