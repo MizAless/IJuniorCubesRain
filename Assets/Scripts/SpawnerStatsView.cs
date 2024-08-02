@@ -1,47 +1,47 @@
 using TMPro;
 using UnityEngine;
 
-public class SpawnerView<T> : MonoBehaviour
+public class SpawnerStatsView<T> : MonoBehaviour
     where T : MonoBehaviour, ISpawnable
 {
-    private const string Spawned = nameof(Spawned);
-    private const string AdditionalString = "Active objects: ";
+    private const string Spawned = "Spawned";
+    private const string Active = "Active";
+    private const string Plural = "'s";
+    private const string Sepatator = ":";
 
     [SerializeField] private TextMeshProUGUI _countText;
     [SerializeField] private TextMeshProUGUI _activeObjectsCountText;
-    private Spawner<T> _spawner;
+    [SerializeField] private Spawner<T> _spawner;
 
-    private string _plural = "'s";
     private string _spawnedObjectName = typeof(T).ToString();
-    private string _sepatator = ": ";
 
     private void Awake()
     {
         UpdateCount(0);
+        UpdateActiveObjectsCount(0);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         _spawner.Spawned -= UpdateCount;
         _spawner.ChangedPoolObjectsCount -= UpdateActiveObjectsCount;
     }
 
-    public void Init(Spawner<T> spawner)
+    private void OnEnable()
     {
-        _spawner = spawner;
-
         _spawner.Spawned += UpdateCount;
         _spawner.ChangedPoolObjectsCount += UpdateActiveObjectsCount;
     }
 
     private void UpdateCount(int newValue)
     {
-        string additionalString = _spawnedObjectName + _plural + " " + Spawned.ToLower() + _sepatator;
+        string additionalString = _spawnedObjectName + Plural + " " + Spawned.ToLower() + Sepatator + " ";
         _countText.text = additionalString + newValue;
     }
 
     private void UpdateActiveObjectsCount(int newValue)
     {
-        _activeObjectsCountText.text = AdditionalString + newValue;
+        string additionalString = Active + " " + _spawnedObjectName + Plural + Sepatator + " ";
+        _activeObjectsCountText.text = additionalString + newValue;
     }
 }

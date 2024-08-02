@@ -23,27 +23,26 @@ public class CubeSpawner : Spawner<Cube>
         base.Release(destroyebleCube as Cube);
     }
 
-    protected override void ActionOnGet(Cube cube)
+    protected override void OnGet(Cube cube)
     {
         cube.Init(GetRandomStartPosition());
         cube.OnCollide += _destroyer.DestroyWithDelay;
         cube.OnCollide += _colorChanger.SetRandomColor;
         cube.DestroyPrepared += Release;
-        base.ActionOnGet(cube); 
+        base.OnGet(cube); 
     }
 
-    protected override void ActionOnRelease(Cube cube)
+    protected override void OnRelease(Cube cube)
     {
-        print("CubeActionOnRelease");
         RemoveAllActions(cube);
         _bombSpawner.Spawn(cube.transform.position);
-        base.ActionOnRelease(cube);
+        base.OnRelease(cube);
     }
 
-    protected override void ActionOnDestroy(Cube cube)
+    protected override void OnRemoveFromPool(Cube cube)
     {
         RemoveAllActions(cube);
-        base.ActionOnDestroy(cube);
+        base.OnRemoveFromPool(cube);
     }
 
     private void RemoveAllActions(Cube cube)

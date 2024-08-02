@@ -11,12 +11,11 @@ public class BombSpawner : Spawner<Bomb>
         base.Release(destroyebleBomb as Bomb);
     }
 
-    protected override void ActionOnRelease(Bomb bomb)
+    protected override void OnRelease(Bomb bomb)
     {
-        print("BombActionOnRelease");
         _exploder.Explode(bomb.transform.position);
         bomb.DestroyPrepared -= Release;
-        base.ActionOnRelease(bomb);
+        base.OnRelease(bomb);
     }
 
     public void Spawn(Vector3 position)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -11,11 +10,6 @@ public class Destroyer : MonoBehaviour
     {
         if (minSecondsToDestroy > maxSecondsToDestroy)
             minSecondsToDestroy = maxSecondsToDestroy - 1f;
-    }
-
-    public void DestroyImmediately(IDestroyable destroyableObj)
-    {
-        destroyableObj.PrepareToDestroy();
     }
 
     public void DestroyWithDelay(IDestroyable destroyableObj)
@@ -40,7 +34,6 @@ public class Destroyer : MonoBehaviour
             yield return delay;
         }
 
-        //yield return new WaitForSeconds(secondsToDestroy);
         destroyableObj.PrepareToDestroy();
     }
 }

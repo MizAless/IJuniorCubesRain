@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public abstract class Spawner<T> : MonoBehaviour, IPoolRequired 
+public abstract class Spawner<T> : MonoBehaviour 
     where T : MonoBehaviour, ISpawnable
 {
     [SerializeField] private T _spawnableObject;
@@ -26,31 +26,26 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
     {
         _pool = new ObjectPool<T>(
             createFunc: () => Instantiate(_spawnableObject),
-            actionOnGet: (obj) => ActionOnGet(obj),
-            actionOnRelease: (obj) => ActionOnRelease(obj),
-            actionOnDestroy: (obj) => ActionOnDestroy(obj),
+            actionOnGet: (obj) => OnGet(obj),
+            actionOnRelease: (obj) => OnRelease(obj),
+            actionOnDestroy: (obj) => OnRemoveFromPool(obj),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
         );
     }
 
-    //public int GetActiveObjectsCount()
-    //{
-    //    return _pool.CountActive;
-    //}
-
-    public virtual T Spawn()
+    public T Spawn()
     {
         return _pool.Get();
     }
 
-    public virtual void Release(T releasedObject)
+    public void Release(T releasedObject)
     {
         _pool.Release(releasedObject);
     }
 
-    protected virtual void ActionOnGet(T getedObject)
+    protected virtual void OnGet(T getedObject)
     {
         getedObject.gameObject.SetActive(true);
         _createdObjectCount++;
@@ -58,13 +53,13 @@ public abstract class Spawner<T> : MonoBehaviour, IPoolRequired
         ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
     }
 
-    protected virtual void ActionOnRelease(T releasedObject)
+    protected virtual void OnRelease(T releasedObject)
     {
         releasedObject.gameObject.SetActive(false);
         ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
     }
 
-    protected virtual void ActionOnDestroy(T destroyedObject)
+    protected virtual void OnRemoveFromPool(T destroyedObject)
     {
         Destroy(destroyedObject.gameObject);
         ChangedPoolObjectsCount?.Invoke(_pool.CountActive);
